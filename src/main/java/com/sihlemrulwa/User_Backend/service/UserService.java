@@ -1,13 +1,15 @@
 package com.sihlemrulwa.User_Backend.service;
 
-import com.sihlemrulwa.User_Backend.model.User;
-import java.util.List;
+import com.sihlemrulwa.User_Backend.dto.UserDto;
+import com.sihlemrulwa.User_Backend.dto.UserCreationDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    User createUser(User user);
-    List<User> getAllUsers();
-    User getUserById(Long id);
-    User updateUser(Long id, User userDetails);
+    UserDto createUser(UserCreationDto userCreationDto);
+    Page<UserDto> getAllUsers(Pageable pageable);
+    UserDto getUserById(Long id);
+    UserDto updateUser(Long id, UserCreationDto userDetails);
     void deleteUser(Long id);
-    User getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 }
