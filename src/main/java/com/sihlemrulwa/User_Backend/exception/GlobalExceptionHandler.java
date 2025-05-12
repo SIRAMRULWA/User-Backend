@@ -1,7 +1,5 @@
 package com.sihlemrulwa.User_Backend.exception;
 
-// 8. Global Exception Handler
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

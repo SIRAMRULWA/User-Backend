@@ -1,7 +1,5 @@
 package com.sihlemrulwa.User_Backend.service;
 
-// 4. Service Interface
-
 import com.sihlemrulwa.User_Backend.model.User;
 import java.util.List;
 

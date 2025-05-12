@@ -1,7 +1,5 @@
 package com.sihlemrulwa.User_Backend.service;
 
-// 5. Service Implementation
-
 import com.sihlemrulwa.User_Backend.exception.ResourceNotFoundException;
 import com.sihlemrulwa.User_Backend.model.User;
 import com.sihlemrulwa.User_Backend.repository.UserRepository;

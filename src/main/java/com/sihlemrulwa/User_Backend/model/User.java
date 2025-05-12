@@ -1,6 +1,5 @@
 package com.sihlemrulwa.User_Backend.model;
 
-// 2. User Model
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

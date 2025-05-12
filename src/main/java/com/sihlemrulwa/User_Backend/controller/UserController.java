@@ -1,7 +1,5 @@
 package com.sihlemrulwa.User_Backend.controller;
 
-// 6. Controller
-
 import com.sihlemrulwa.User_Backend.model.User;
 import com.sihlemrulwa.User_Backend.service.UserService;
 import jakarta.validation.Valid;
