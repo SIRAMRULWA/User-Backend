@@ -6,13 +6,15 @@ import com.sihlemrulwa.User_Backend.exception.ResourceNotFoundException;
 import com.sihlemrulwa.User_Backend.mapper.UserMapper;
 import com.sihlemrulwa.User_Backend.model.User;
 import com.sihlemrulwa.User_Backend.repository.UserRepository;
-import com.sihlemrulwa.User_Backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -105,5 +107,52 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return userMapper.toUserDto(user);
+    }
+
+    @Override
+    public List<UserDto> findUsers(String name, String email, String role, String status, Integer minAge, Integer maxAge) {
+        Specification<User> spec = Specification.where(null);
+
+        // Add specifications based on provided parameters
+        if (name != null && !name.isEmpty()) {
+            spec = spec.and((root, query, cb) -> {
+                // Search in both firstName and lastName
+                String nameLower = "%" + name.toLowerCase() + "%";
+                return cb.or(
+                        cb.like(cb.lower(root.get("firstName")), nameLower),
+                        cb.like(cb.lower(root.get("lastName")), nameLower)
+                );
+            });
+        }
+
+        if (email != null && !email.isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
+        }
+
+        if (role != null && !role.isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("role"), role));
+        }
+
+        if (status != null && !status.isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("status"), status));
+        }
+
+        if (minAge != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("age"), minAge));
+        }
+
+        if (maxAge != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("age"), maxAge));
+        }
+
+        List<User> users = userRepository.findAll(spec);
+        return users.stream()
+                .map(userMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 }

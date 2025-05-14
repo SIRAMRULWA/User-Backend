@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -54,6 +56,30 @@ public class UserController {
     ) {
         Page<UserDto> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Search/filter users by various criteria
+     *
+     * @param name Optional name filter
+     * @param email Optional email filter
+     * @param role Optional role filter
+     * @param status Optional status filter
+     * @param minAge Optional minimum age filter
+     * @param maxAge Optional maximum age filter
+     * @return List of matching users
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDto>> getUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer minAge,
+            @RequestParam(required = false) Integer maxAge
+    ) {
+        List<UserDto> filteredUsers = userService.findUsers(name, email, role, status, minAge, maxAge);
+        return ResponseEntity.ok(filteredUsers);
     }
 
     /**

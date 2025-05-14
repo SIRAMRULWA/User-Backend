@@ -47,11 +47,15 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/users/register",
+                                "/api/users/check-email",
+                                "/api/users/email/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        ).permitAll()  // Permit all these endpoints
+                        .anyRequest().permitAll()  // Permit all other requests (remove authentication)
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -62,7 +66,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // TODO: Change to frontend domain in production
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // Update as needed
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList(
                 "Authorization", "Content-Type", "X-Requested-With", "Accept",
