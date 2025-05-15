@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class UserCreationDto {
-    // Getters and setters
+
     @NotBlank(message = "First name is required")
     @Size(max = 50)
     private String firstName;
@@ -27,4 +27,7 @@ public class UserCreationDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
+    @NotBlank(message = "Role is required") // <-- NEW
+    @Size(max = 30)
+    private String role;
 }

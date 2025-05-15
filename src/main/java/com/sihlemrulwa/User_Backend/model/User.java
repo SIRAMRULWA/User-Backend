@@ -9,42 +9,51 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
 
-    // Getters and setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "First name is required")
     @Size(max = 50)
+    @Column(nullable = false)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
     @Size(max = 50)
+    @Column(nullable = false)
     private String lastName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     @Size(max = 100)
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String password;
 
+    @Size(max = 50)
+    @Column(nullable = false)
+    private String role; // e.g., ADMIN, USER
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     @PreUpdate
@@ -52,16 +61,15 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Default constructor
     public User() {
     }
 
-    // Constructor with fields
-    public User(String firstName, String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, String password, String role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     @Override
@@ -71,6 +79,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

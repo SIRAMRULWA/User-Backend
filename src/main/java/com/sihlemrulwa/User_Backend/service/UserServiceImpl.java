@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    // Constructor injection (preferred over @Autowired)
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
@@ -37,21 +36,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserCreationDto userCreationDto) {
-        // Check if email already exists
         if (userRepository.existsByEmail(userCreationDto.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
 
-        // Convert DTO to User entity
         User user = new User();
         user.setFirstName(userCreationDto.getFirstName());
         user.setLastName(userCreationDto.getLastName());
         user.setEmail(userCreationDto.getEmail());
-
-        // Hash the password before storing
         user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
 
-        // Save and return DTO
+        // Set role if provided, otherwise you may set a default role
+        if (userCreationDto.getRole() != null && !userCreationDto.getRole().isEmpty()) {
+            user.setRole(userCreationDto.getRole());
+        } else {
+            user.setRole("USER"); // default role
+        }
+
         User savedUser = userRepository.save(user);
         return userMapper.toUserDto(savedUser);
     }
@@ -74,11 +75,9 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        // Update fields
         existingUser.setFirstName(userDetails.getFirstName());
         existingUser.setLastName(userDetails.getLastName());
 
-        // Check if email is being changed and is unique
         if (!existingUser.getEmail().equals(userDetails.getEmail())) {
             if (userRepository.existsByEmail(userDetails.getEmail())) {
                 throw new IllegalArgumentException("Email is already in use");
@@ -86,9 +85,13 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDetails.getEmail());
         }
 
-        // Update password if provided
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        }
+
+        // Update role if provided
+        if (userDetails.getRole() != null && !userDetails.getRole().isEmpty()) {
+            existingUser.setRole(userDetails.getRole());
         }
 
         User updatedUser = userRepository.save(existingUser);
@@ -113,10 +116,8 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> findUsers(String name, String email, String role, String status, Integer minAge, Integer maxAge) {
         Specification<User> spec = Specification.where(null);
 
-        // Add specifications based on provided parameters
         if (name != null && !name.isEmpty()) {
             spec = spec.and((root, query, cb) -> {
-                // Search in both firstName and lastName
                 String nameLower = "%" + name.toLowerCase() + "%";
                 return cb.or(
                         cb.like(cb.lower(root.get("firstName")), nameLower),
